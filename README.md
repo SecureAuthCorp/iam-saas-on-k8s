@@ -39,7 +39,6 @@ export DOCKER_PWD=<password>
 ## What is next?
 
 * Check out ACP [documentation](http://docs.authorization.cloudentity.com)
-* Install Istio `make install-istio` and experiment with the [MicroPerimeter Authorizer for Istio](https://docs.authorization.cloudentity.com/howto/protect/istio/)
 * Integrate your SPA app using our [Auth JS Lib](https://github.com/cloudentity/cloudentity-auth-js)
 * Explore strong service mTLS based authentication using [Sample Go mTLS OAuth app](https://github.com/cloudentity/sample-go-mtls-oauth-client)
 
@@ -50,24 +49,15 @@ export DOCKER_PWD=<password>
 * `make prepare-helm` -  Adds necessary helm chart repositories
 * `make prepare-cluster` - Creates required namespaces and initializes the docker credentials stored in .env file (please make sure you have `DOCKER_USER` and `DOCKER_PWD` correctly configured in the .env file) 
 * `make install-acp-stack` - Installs the acp stack using the [ACP helm charts](https://charts.cloudentity.io) and the `acp` release name
-* `make install-istio` -  Installs Istio 1.9.3 on the Kubernetes cluster
 * `make watch` - Checks the status of the deployment 
 * `make uninstall-acp` - Uninstalls the `acp` release
 * `make delete-cluster` - Deletes Kind based Kubernetes cluster
-* `make deploy-cmd-pod` - Deploys the CMD pod in the default namespace; this pod is helpful with the Istio authorization testing.
-* `make install-countries` - Deploys the countries GraphQL API in the default namespace; this pod is helpful for testing GraphQL authorization. The Coutries API is publicly available https://countries.trevorblades.com/
 
 If you would like to test your modifications of the [ACP helm charts](https://charts.cloudentity.io), point `ACP_CHARTS_PATH` to your clone:
 
 * `make ACP_CHARTS_PATH=../acp-helm-charts/charts all`
 
 This is also a handy way to spin up older releases of ACP.
-
-## Usage of the CMD Pod
-
-1. Run `make deploy-cmd-pod`
-2. Export CMD_POD name: `export CMD_POD=$(kubectl get pod -l app=sleep -o jsonpath={.items..metadata.name})`
-3. Run the requested operation in te context of a Kubernetes cluster: `kubectl exec -it $CMD_POD -c sleep -- curl https://acp.acp-system:8443/alive --insecure`
 
 ## Running OpenBanking quickstart
 
@@ -79,26 +69,3 @@ openbanking_domestic_payment_consents: true
 system_clients_management: true
 ```
 2. Run `make install-openbanking`
-
-## GraphQL demo
-Instruction ow to run a GraphQL service and be able to play around.
-
-Prerequisites: make sure you use ACP version that supports GraphQL - 2.0.0 or latest.
-
-1. `make graphql-demo` - installs ACP and all components
-2. Add local domain to `/etc/hosts`:
-```
-127.0.0.1 countries.ingress.k8s
-```
-3. Go to `https://acp.acp-system:8443/system/admin/app`, log in with `admin` and default system password, switch to system workspace. GraphQL service should be discovered.
-4. Go to GraphQL UI service `http://countries.ingress.k8s:9080`, change
-5. Change API URL to `http://countries.ingress.k8s:9080/gqlapi`
-6. Run queries, example:
-```
-{
-  country(code:"PL") {
-    name
-    code
-  }
-}
-```
