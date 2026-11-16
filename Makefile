@@ -61,21 +61,6 @@ install-acp-stack:
 		--timeout 11m \
 		--install
 
-install-istio-authorizer:
-	helm upgrade istio-authorizer acp/istio-authorizer \
-		--values ./values/istio-authorizer.yaml \
-		--namespace acp-istio-authorizer \
-		--create-namespace \
-		--timeout 5m \
-		--install \
-		--wait
-
-install-istio:
-	curl --location https://istio.io/downloadIstio | ISTIO_VERSION=1.14.4 TARGET_ARCH=x86_64  sh -
-	./istio-1.14.4/bin/istioctl install --filename ./config/ce-istio-profile.yaml --skip-confirmation
-	kubectl label namespace default istio-injection=enabled
-	rm -r -f ./istio-1.14.4
-
 wait-acp:
 	kubectl wait deploy/acp \
 		--for condition=available \
@@ -92,12 +77,6 @@ delete-cluster:
 	kind delete cluster --name acp
 
 ## helpers
-deploy-cmd-pod:
-	kubectl apply --filename https://raw.githubusercontent.com/istio/istio/release-1.9/samples/sleep/sleep.yaml
-
-check-istio-ingress:
-	curl http://localhost:15021/healthz/ready --verbose
-
 install-example:
 	kubectl apply --filename ./examples/httpbin
 
@@ -183,17 +162,3 @@ test-copy-results:
 	rm --recursive --force temp; \
 	mkdir temp &&	\
 	docker cp test-runner:/qa/tests/web/target/allure-results temp
-
-graphql-demo:
-	make all
-	make install-istio
-
-	helm upgrade istio-authorizer acp/istio-authorizer \
-	--values ./values/istio-authorizer-graphql.yaml \
-	--namespace acp-istio-authorizer \
-	--create-namespace \
-	--timeout 5m \
-	--install \
-	--wait
-
-	make install-countries
