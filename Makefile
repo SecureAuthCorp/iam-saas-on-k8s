@@ -103,14 +103,17 @@ check-acp-server-responsivness:
 		--fail
 
 debug:
+	-kubectl get pods --all-namespaces
 	-kubectl get all --all-namespaces
 	-kubectl logs daemonset/kindnet --namespace kube-system
 	-kubectl logs daemonset/kube-proxy --namespace kube-system
-	-kubectl logs deploy/acp --namespace kube-system
-	-kubectl logs deploy/ingress-nginx-controller --namespace kube-system
+	-kubectl logs deploy/ingress-nginx-controller --namespace nginx
 	-kubectl logs deploy/coredns --namespace kube-system
 	-kubectl logs deploy/local-path-provisioner --namespace local-path-storage
+	-kubectl describe deploy/acp --namespace acp-system
 	-kubectl describe pod --selector app.kubernetes.io/name=acp --namespace acp-system
+	-kubectl logs deploy/acp --namespace acp-system
+	-kubectl logs deploy/acp --namespace acp-system --previous
 
 ## tests
 
