@@ -20,7 +20,7 @@ jobs:
           image: "kindest/node:v1.24.6@sha256:97e8d00bc37a7598a0b32d1fabd155a96355c49fa0d4d4790aab0f161bf31be1"
       - uses: azure/setup-helm@18bc76811624f360dbd7f18c2d4ecb32c7b87bab # v1
         with:
-          version: 3.5.4
+          version: 3.14.4
         id: install
       - name: Login to docker.cloudentity.io
         run: echo "${{ secrets.DOCKER_PWD }}" | docker login docker.cloudentity.io -u "${{ secrets.DOCKER_USER }}" --password-stdin
