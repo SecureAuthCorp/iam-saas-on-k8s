@@ -48,6 +48,7 @@ prepare-cluster:
 
 install-ingress-controller:
 	helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
+		--version 4.8.3 \
 		--values ./values/ingress-nginx.yaml \
 		--namespace nginx \
 		--timeout 2m \
