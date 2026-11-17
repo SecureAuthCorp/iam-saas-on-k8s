@@ -9,7 +9,7 @@ This repository's primary purpose is to enable you to rapidly stand up Cloudenti
 * [kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) 0.16.x 
 * [helm](https://helm.sh/docs/intro/install/) 3.x.x 
 * [kubectl](https://kubernetes.io/docs/tasks/tools/) 1.24.x
-* Credentials to access Cloudentity Private Docker Repo - if you are our client, you can find it in your Support Portal; if you are not and you want to check out our product, feel free to request access via our [website](https://cloudentity.com).
+* Credentials to access the private Docker registry `docker.secureauth.com` - if you are our client, you can find it in your Support Portal; if you are not and you want to check out our product, feel free to request access via our [website](https://cloudentity.com).
 
 ## Quickstart
 1. For `kind` tool please follow the instructions below to install globally. For the rest tools please follow the official instructions linked above.
@@ -24,7 +24,7 @@ On macOS:
 ```
 brew install kind
 ```
-2. Add environment variables `DOCKER_USER` and `DOCKER_PWD` for Cloudentity Private Docker Repo:
+2. Add environment variables `DOCKER_USER` and `DOCKER_PWD` for the private Docker registry `docker.secureauth.com`:
 ```
 export DOCKER_USER=<user>
 export DOCKER_PWD=<password>

@@ -22,8 +22,8 @@ jobs:
         with:
           version: 3.14.4
         id: install
-      - name: Login to docker.cloudentity.io
-        run: echo "${{ secrets.DOCKER_PWD }}" | docker login docker.cloudentity.io -u "${{ secrets.DOCKER_USER }}" --password-stdin
+      - name: Login to docker.secureauth.com
+        run: echo "${{ secrets.DOCKER_PWD }}" | docker login docker.secureauth.com -u "${{ secrets.DOCKER_USER }}" --password-stdin
       - name: Deploy
         env: # Or as an environment variable
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
