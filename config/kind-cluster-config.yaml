@@ -2,21 +2,9 @@ kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 nodes:
   - role: control-plane
-    image: kindest/node:v1.24.6@sha256:97e8d00bc37a7598a0b32d1fabd155a96355c49fa0d4d4790aab0f161bf31be1
+    image: kindest/node:v1.32.2@sha256:f226345927d7e348497136874b6d207e0b32cc52154ad8323129352923a3142f
     extraPortMappings:
 #ACP Ingress controler
       - containerPort: 30443
         hostPort: 8443
-        protocol: TCP
-#Istio Ingres status endpoint
-      - containerPort: 30002
-        hostPort: 15021
-        protocol: TCP
-#Istio Ingres http port
-      - containerPort: 31080
-        hostPort: 9080
-        protocol: TCP
-#Istio Ingres https port
-      - containerPort: 31443
-        hostPort: 9443
         protocol: TCP

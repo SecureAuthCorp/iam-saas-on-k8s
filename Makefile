@@ -39,15 +39,16 @@ endif
 prepare-cluster:
 	kubectl create namespace acp-system
 	kubectl create namespace nginx
-	kubectl create secret docker-registry docker.cloudentity.io \
+	kubectl create secret docker-registry docker.secureauth.com \
 		--namespace acp-system \
-		--docker-server docker.cloudentity.io \
+		--docker-server docker.secureauth.com \
 		--docker-username ${DOCKER_USER} \
 		--docker-password ${DOCKER_PWD}
 	kubectl apply -f ./config/timescale-role-binding.yaml
 
 install-ingress-controller:
 	helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
+		--version 4.8.3 \
 		--values ./values/ingress-nginx.yaml \
 		--namespace nginx \
 		--timeout 2m \
@@ -60,21 +61,6 @@ install-acp-stack:
 		--namespace acp-system \
 		--timeout 11m \
 		--install
-
-install-istio-authorizer:
-	helm upgrade istio-authorizer acp/istio-authorizer \
-		--values ./values/istio-authorizer.yaml \
-		--namespace acp-istio-authorizer \
-		--create-namespace \
-		--timeout 5m \
-		--install \
-		--wait
-
-install-istio:
-	curl --location https://istio.io/downloadIstio | ISTIO_VERSION=1.14.4 TARGET_ARCH=x86_64  sh -
-	./istio-1.14.4/bin/istioctl install --filename ./config/ce-istio-profile.yaml --skip-confirmation
-	kubectl label namespace default istio-injection=enabled
-	rm -r -f ./istio-1.14.4
 
 wait-acp:
 	kubectl wait deploy/acp \
@@ -92,28 +78,6 @@ delete-cluster:
 	kind delete cluster --name acp
 
 ## helpers
-deploy-cmd-pod:
-	kubectl apply --filename https://raw.githubusercontent.com/istio/istio/release-1.9/samples/sleep/sleep.yaml
-
-check-istio-ingress:
-	curl http://localhost:15021/healthz/ready --verbose
-
-install-example:
-	kubectl apply --filename ./examples/httpbin
-
-install-countries:
-	docker build examples/countries/ --tag countries:demo
-	kind load docker-image countries:demo --name acp
-	kubectl apply --filename ./examples/countries
-
-install-example-resort:
-	docker build examples/resort/ --tag resort:demo
-	kind load docker-image resort:demo --name acp
-	kubectl apply --filename ./examples/resort
-
-uninstall-example-resort:
-	kubectl delete --filename ./examples/resort
-
 install-cert-manager:
 	kubectl create namespace cert-manager
 	kubectl apply --filename https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.crds.yaml
@@ -139,14 +103,19 @@ check-acp-server-responsivness:
 		--fail
 
 debug:
+	-kubectl get pods --all-namespaces
 	-kubectl get all --all-namespaces
 	-kubectl logs daemonset/kindnet --namespace kube-system
 	-kubectl logs daemonset/kube-proxy --namespace kube-system
-	-kubectl logs deploy/acp --namespace kube-system
-	-kubectl logs deploy/ingress-nginx-controller --namespace kube-system
+	-kubectl logs deploy/ingress-nginx-controller --namespace nginx
 	-kubectl logs deploy/coredns --namespace kube-system
 	-kubectl logs deploy/local-path-provisioner --namespace local-path-storage
+	-kubectl describe sts/redis-cluster --namespace acp-system
+	-kubectl logs sts/redis-cluster --namespace acp-system --all-containers --tail=50
+	-kubectl describe deploy/acp --namespace acp-system
 	-kubectl describe pod --selector app.kubernetes.io/name=acp --namespace acp-system
+	-kubectl logs deploy/acp --namespace acp-system
+	-kubectl logs deploy/acp --namespace acp-system --previous
 
 ## tests
 
@@ -162,14 +131,14 @@ test-prepare-grid:
 		selenium/hub:4.2.2-20220609
 
 test-prepare-runner:
-	docker pull docker.cloudentity.io/acceptance-tests:${TEST_DOCKER_VERSION}
+	docker pull docker.secureauth.com/acceptance-tests:${TEST_DOCKER_VERSION}
 	docker run --tty --detach --rm \
 		--name test-runner \
 		--network host \
 		--add-host acp.acp-system:127.0.0.1 \
 		--add-host selenium-grid-hub:127.0.0.1 \
 		--user 1000:1000 \
-		docker.cloudentity.io/acceptance-tests:${TEST_DOCKER_VERSION} /bin/sh
+		docker.secureauth.com/acceptance-tests:${TEST_DOCKER_VERSION} /bin/sh
 
 test-prepare: test-prepare-grid test-prepare-runner
 
@@ -183,17 +152,3 @@ test-copy-results:
 	rm --recursive --force temp; \
 	mkdir temp &&	\
 	docker cp test-runner:/qa/tests/web/target/allure-results temp
-
-graphql-demo:
-	make all
-	make install-istio
-
-	helm upgrade istio-authorizer acp/istio-authorizer \
-	--values ./values/istio-authorizer-graphql.yaml \
-	--namespace acp-istio-authorizer \
-	--create-namespace \
-	--timeout 5m \
-	--install \
-	--wait
-
-	make install-countries
