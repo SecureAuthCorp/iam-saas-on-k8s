@@ -110,6 +110,8 @@ debug:
 	-kubectl logs deploy/ingress-nginx-controller --namespace nginx
 	-kubectl logs deploy/coredns --namespace kube-system
 	-kubectl logs deploy/local-path-provisioner --namespace local-path-storage
+	-kubectl describe sts/redis-cluster --namespace acp-system
+	-kubectl logs sts/redis-cluster --namespace acp-system --all-containers --tail=50
 	-kubectl describe deploy/acp --namespace acp-system
 	-kubectl describe pod --selector app.kubernetes.io/name=acp --namespace acp-system
 	-kubectl logs deploy/acp --namespace acp-system
